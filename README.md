@@ -3,9 +3,11 @@ Assignment 2: Constraint Satisfaction Problem
 Deadline: Monday, November 12, 11:59:59PM
 As on Assignment 1, you have the option of working in groups of up to three
 people. You are free to either stay with the same team or pick a new one.
-CSP - Flow Free
+
+# CSP - Flow Free
 Created by Litian Ma and Jialu Li based on Flow_Free
 Introduction and rules
+
 Flow Free is a puzzle game for iOS and Android released by Big Duck Games on
 June 2012. The goal for this game is to fill in colors on all empty grid cells to form
 "pipes" such that the colors are able to flow between two given sources. You will be
@@ -20,24 +22,34 @@ cells above, below, to the left, and to the right, if they exist) should have ex
 cells filled with the same color. For each source cell, its neighborhood should have
 exactly one cell filled with the same color. The following picture shows an example of
 the disallowed "zigzag" pattern.
+
+
 First, you need to formulate Flow Free as a CSP. In your report, give your definitions
 of variables, domains, and constraints. Next, with these in mind, implement
 backtracking search. In the report, describe your implementation and give a brief
 explanation of why you chose to use your particular combination of heuristics and
 inference techniques.
+
+
 You need to run your solver on several input puzzles. You will use the input and
 output formats illustrated by the sample 5*5 puzzle and the corresponding solution.
 For each of the inputs below, please include in your report:
+
+
 A. Your solution, i.e., the filled game board that satisfies all the constraints like
 the example above.
 B. The number of attempted assignments and the execution time of the algorithms
 (in seconds or milliseconds
-Inputs
+
+
+# Inputs
 You are required to solve the following three puzzles:
 1. 7*7 puzzle
 2. 8*8 puzzle
 3. 9*9 puzzle
-Report Checklist
+
+# Report Checklist
+
 Your report should briefly describe your implemented solution. Your description
 should focus on the most "interesting" aspects of your solution, i.e., any non-obvious
 implementation choices (including programming language chosen) and parameter
@@ -51,10 +63,14 @@ your backtracking search implementation. For each of the puzzles of size of 7*7,
 and 9*9, report the solution and provide the number of attempted variable
 assignments and execution time for your implementation.
 Statement of individual contribution:
+
+
 • All group reports need to include a brief summary of which group member was
 responsible for which parts of the solution and submitted material. We reserve
 the right to contact group members individually to verify this information
 Submission Instructions
+
+
 By the submission deadline, one designated person from the group will need to
 upload the following to D2L/Brightspace:
 1. A report in PDF format. Be sure to put the names of all the group members at
