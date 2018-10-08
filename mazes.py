@@ -32,7 +32,6 @@ def print_maze(maze):
             print(element.value, end='')
         print('')
 
-
 class Node:
     def __init__(self, val, x, y):
         self.visited = False
@@ -41,9 +40,6 @@ class Node:
         self.y = y
         self.neighbors = []
         self.previous = None
-        #if this node is a wall, treat as visited
-        if val is '%':
-            self.visited = True
 
     def is_visited(self):
         self.visited = True
