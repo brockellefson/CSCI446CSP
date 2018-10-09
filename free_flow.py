@@ -70,7 +70,10 @@ class CSP:
 
                     self.color_visited[curr_color].append(node)
                     for neighbor in node.neighbors:
-                        if neighbor not in self.color_visited.values() and self.are_different(neighbor, self.color_finish[curr_color]):
+                        if self.are_different(neighbor, self.color_finish[curr_color]):
+                            for visted_nodes in self.color_visited.values():
+                                if neighbor in visted_nodes:
+                                    break
                             neighbor.previous = node
                             task = random.randint(0, 100000000000000000000)
                             heapq.heappush(queue, (self.manhattan_d(neighbor, self.color_finish[curr_color]), task, neighbor))
@@ -107,7 +110,8 @@ class CSP:
             mazes.print_maze(self.maze)
             print("Length of visited stack for {}: {}".format(color, len(self.color_visited[color])))
             print("Node: {} x: {} y: {}".format(node.value, node.x, node.y))
-
+            print("color visited values")
+            print(self.color_visited.values())
 if __name__=='__main__':
     #create mazes
     maze_5x5 = mazes.read_maze("5x5maze.txt")
