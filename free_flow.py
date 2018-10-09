@@ -66,6 +66,7 @@ class CSP:
                             return True
                         curr_color = self.domain[color] #sets current color to track
                         queue = self.color_queue[curr_color] #gives the first color from domains list of visited nodes, then picks first node visited
+                        continue
 
                     self.color_visited[curr_color].append(node)
                     for neighbor in node.neighbors:
@@ -100,16 +101,12 @@ class CSP:
     def color_path(self):
         print("Solution Found:")
         for color in self.domain:
-            org_val = ''
             print ("Color {} Solution:".format(color))
             for node in self.color_visited[color]:
-                org_val = node.value
                 node.value = color
             mazes.print_maze(self.maze)
             print("Length of visited stack for {}: {}".format(color, len(self.color_visited[color])))
-            for node in self.color_visited[color]:
-                node.value = org_val
-                print("Node: {} x: {} y: {}".format(node.value, node.x, node.y))
+            print("Node: {} x: {} y: {}".format(node.value, node.x, node.y))
 
 if __name__=='__main__':
     #create mazes
