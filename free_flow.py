@@ -13,7 +13,7 @@ class CSP:
         self.color_visited = defaultdict(list)
         self.color_finish = {}
         self.color_start = {}
-
+        self.task = 0
         for color in self.domain:
             self.csp(color, None, None)
         mazes.print_maze(self.maze)
@@ -37,8 +37,7 @@ class CSP:
 
                         #add start to dic of that colors visited heap
                         heapq.heapify(self.color_queue[color])
-                        task = random.randint(0, 100000000000000000000)
-                        heapq.heappush(self.color_queue[color], (0, task, start))
+                        heapq.heappush(self.color_queue[color], (0, self.call_task(), start))
                         return
 
     def greedy_search(self):
@@ -71,18 +70,27 @@ class CSP:
                     self.color_visited[curr_color].append(node)
                     for neighbor in node.neighbors:
                         if self.are_different(neighbor, self.color_finish[curr_color]):
-                            for visted_nodes in self.color_visited.values():
-                                if neighbor in visted_nodes:
-                                    break
+                            if self.in_visited(neighbor):
+                                continue
+
                             neighbor.previous = node
-                            task = random.randint(0, 100000000000000000000)
-                            heapq.heappush(queue, (self.manhattan_d(neighbor, self.color_finish[curr_color]), task, neighbor))
+                            heapq.heappush(queue, (self.manhattan_d(neighbor, self.color_finish[curr_color]), self.call_task(), neighbor))
             print("Mistake made, backtracking")
             del self.color_visited[curr_color]
             color -= 1
             curr_color = self.domain[color] #sets current color to track
             queue = self.color_queue[curr_color] #gives the first color from domains list of visited nodes, then picks first node visited
         print("Solution Not Found")
+        return False
+
+    def call_task(self):
+        self.task += 1
+        return self.task
+
+    def in_visited(self, curr_node):
+        for visted_nodes in self.color_visited.values():
+            if curr_node in visted_nodes:
+                return True
         return False
 
     def manhattan_d(self, curr_node, node):
@@ -110,8 +118,6 @@ class CSP:
             mazes.print_maze(self.maze)
             print("Length of visited stack for {}: {}".format(color, len(self.color_visited[color])))
             print("Node: {} x: {} y: {}".format(node.value, node.x, node.y))
-            print("color visited values")
-            print(self.color_visited.values())
 if __name__=='__main__':
     #create mazes
     maze_5x5 = mazes.read_maze("5x5maze.txt")
