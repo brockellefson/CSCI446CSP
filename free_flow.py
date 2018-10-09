@@ -50,6 +50,11 @@ class CSP:
             #while there is still aval nodes
             while len(queue) > 0:
                     node = heapq.heappop(queue)[2] #pops node
+                    print("Evaluating x:{} y:{}, current color is {} and is_visited is: {}".format(node.x, node.y, curr_color, self.in_visited(node)))
+                    org_val = node.value
+                    node.value = 'X'
+                    mazes.print_maze(self.maze)
+                    node.value = org_val
 
                     if node in self.color_visited.values():
                         continue
