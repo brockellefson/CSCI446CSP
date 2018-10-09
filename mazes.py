@@ -31,7 +31,7 @@ def print_maze(maze):
         for element in row:
             print(element.value, end='')
         print('')
-    print('\n')
+    print()
 
 class Node:
     def __init__(self, val, x, y):

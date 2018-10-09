@@ -52,12 +52,12 @@ class CSP:
             while len(queue) > 0:
                     node = heapq.heappop(queue)[2] #pops node
 
-                    if node in self.color_visited[curr_color]:
+                    if node in self.color_visited.values():
                         continue
 
                     if node is self.color_finish[curr_color]:
                         print("Color {} found solution on node {} Coord: x:{} y{}".format(curr_color, node.value, node.x, node.y))
-                        print ("The real solution is on x:{} y{}".format(self.color_finish[curr_color].x, self.color_finish[curr_color].y))
+                        print ("The real solution is on x:{} y{}\n".format(self.color_finish[curr_color].x, self.color_finish[curr_color].y))
                         #advance to next color
                         color += 1
                         #if all colors are done, print maze
@@ -65,6 +65,7 @@ class CSP:
                             self.color_path()
                             return True
                         curr_color = self.domain[color] #sets current color to track
+                        queue = self.color_queue[curr_color] #gives the first color from domains list of visited nodes, then picks first node visited
 
                     self.color_visited[curr_color].append(node)
                     for neighbor in node.neighbors:
@@ -72,9 +73,11 @@ class CSP:
                             neighbor.previous = node
                             task = random.randint(0, 100000000000000000000)
                             heapq.heappush(queue, (self.manhattan_d(neighbor, self.color_finish[curr_color]), task, neighbor))
+            print("Mistake made, backtracking")
             del self.color_visited[curr_color]
             color -= 1
             curr_color = self.domain[color] #sets current color to track
+            queue = self.color_queue[curr_color] #gives the first color from domains list of visited nodes, then picks first node visited
         print("Solution Not Found")
         return False
 
@@ -97,15 +100,16 @@ class CSP:
     def color_path(self):
         print("Solution Found:")
         for color in self.domain:
-            org = ''
+            org_val = ''
+            print ("Color {} Solution:".format(color))
             for node in self.color_visited[color]:
-                org = node.value
+                org_val = node.value
                 node.value = color
-            print("Printing Color {}".format(color))
             mazes.print_maze(self.maze)
+            print("Length of visited stack for {}: {}".format(color, len(self.color_visited[color])))
             for node in self.color_visited[color]:
-                node.value = org
-        mazes.print_maze(self.maze)
+                node.value = org_val
+                print("Node: {} x: {} y: {}".format(node.value, node.x, node.y))
 
 if __name__=='__main__':
     #create mazes
