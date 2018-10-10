@@ -73,18 +73,32 @@ class CSP:
                         continue
 
                     self.color_visited[curr_color].append(node)
+                    backtrack = True
                     for neighbor in node.neighbors:
-                        if self.are_different(neighbor, self.color_finish[curr_color]):
-                            if self.in_visited(neighbor):
+                        if not self.are_different(neighbor, self.color_finish[curr_color]):
                                 continue
 
-                            neighbor.previous = node
-                            heapq.heappush(queue, (self.manhattan_d(neighbor, self.color_finish[curr_color]), self.call_task(), neighbor))
-            print("Mistake made, backtracking")
+                        backtrack = False
+                        neighbor.previous = node
+                        heapq.heappush(queue, (self.manhattan_d(neighbor, self.color_finish[curr_color]), self.call_task(), neighbor))
+                    if backtrack: #if all neighbors are visited, we backtrack, pulling all neighbors of visited except for the node we backtrack to
+                        print("Backtracking")
+                        for neighbor in node.neighbors:
+                            if neighbor is not node.previous:
+                                if neighbor in self.color_visited[curr_color]:
+                                    self.color_visited[curr_color].remove(neighbor)
+
+            print("Mistake made, Changing colors")
             del self.color_visited[curr_color]
+            self.color_queue[curr_color].clear()
+            heapq.heappush(self.color_queue[curr_color], (0, self.call_task(), self.color_start[curr_color]))
             color -= 1
             curr_color = self.domain[color] #sets current color to track
-            queue = self.color_queue[curr_color] #gives the first color from domains list of visited nodes, then picks first node visited
+            queue = self.color_queue[curr_color]
+            self.color_visited[curr_color].clear()
+            print("This is the visited nodes")
+            self.color_path(curr_color)
+            print("Length of the queue {}".format(len(queue)))
         print("Solution Not Found")
         return False
 
@@ -103,7 +117,7 @@ class CSP:
 
     def are_different(self, curr_node, finish):
         #return true if next node is a valid space
-        if curr_node.value is "_" or curr_node.value is finish.value:
+        if not self.in_visited(curr_node) and curr_node.value is '_' or curr_node.value is finish.value:
             return True
         return False
 
@@ -114,15 +128,16 @@ class CSP:
         mazes.print_maze(self.maze)
         node.value = actual
 
-    def color_path(self):
-        print("Solution Found:")
-        for color in self.domain:
-            print ("Color {} Solution:".format(color))
-            for node in self.color_visited[color]:
-                node.value = color
-            mazes.print_maze(self.maze)
-            print("Length of visited stack for {}: {}".format(color, len(self.color_visited[color])))
-            print("Node: {} x: {} y: {}".format(node.value, node.x, node.y))
+    def color_path(self, color):
+        for row in self.maze:
+            for element in row:
+                if element in self.color_visited[color]:
+                    print(color, end='')
+                else:
+                    print(element.value, end='')
+            print('')
+        print()
+
 if __name__=='__main__':
     #create mazes
     maze_5x5 = mazes.read_maze("5x5maze.txt")
