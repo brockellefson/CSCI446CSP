@@ -75,7 +75,7 @@ class CSP:
                     self.color_visited[curr_color].append(node)
                     backtrack = True
                     for neighbor in node.neighbors:
-                        if not self.are_different(neighbor, self.color_finish[curr_color]):
+                        if not self.are_different(neighbor, self.color_finish[curr_color]) or self.zig_zag(neighbor, curr_color):
                                 continue
 
                         backtrack = False
@@ -84,9 +84,9 @@ class CSP:
                     if backtrack: #if all neighbors are visited, we backtrack, pulling all neighbors of visited except for the node we backtrack to
                         print("Backtracking")
                         for neighbor in node.neighbors:
-                            if neighbor is not node.previous:
-                                if neighbor in self.color_visited[curr_color]:
-                                    self.color_visited[curr_color].remove(neighbor)
+                            if neighbor is not node.previous and neighbor in self.color_visited[curr_color]:
+                                self.color_visited[curr_color].remove(neighbor)
+
 
             print("Mistake made, Changing colors")
             del self.color_visited[curr_color]
@@ -95,11 +95,21 @@ class CSP:
             color -= 1
             curr_color = self.domain[color] #sets current color to track
             queue = self.color_queue[curr_color]
-            self.color_visited[curr_color].clear()
+            #self.color_visited[curr_color].clear()
             print("This is the visited nodes")
             self.color_path(curr_color)
             print("Length of the queue {}".format(len(queue)))
         print("Solution Not Found")
+        return False
+
+    def zig_zag(self, curr_node, color):
+        count = 0
+        for neighbor in curr_node.neighbors:
+            if neighbor.value is color:
+                count += 1
+        if count > 2:
+            return True
+
         return False
 
     def call_task(self):
@@ -120,13 +130,6 @@ class CSP:
         if not self.in_visited(curr_node) and curr_node.value is '_' or curr_node.value is finish.value:
             return True
         return False
-
-    def print_current(self, node):
-        #prints out where path currently is for debugging
-        actual = node.value
-        node.value = "X"
-        mazes.print_maze(self.maze)
-        node.value = actual
 
     def color_path(self, color):
         for row in self.maze:
