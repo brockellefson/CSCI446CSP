@@ -40,14 +40,13 @@ class CSP:
             return False
 
         for color in self.domain:
-            if self.consistant(color, assignment):
+            if self.consistant(color, node, assignment):
                 self.visited.append(node)
-                node.value = color
                 result = self.dumb_backtracking(assignment)
                 if result:
                     return result
-            self.visited.remove(node)
-            node.value = '_'
+                self.visited.remove(node)
+                node.value = '_'
         return False
 
     def backtracking(self, assignment):
@@ -81,8 +80,39 @@ class CSP:
                     return False
         return False
 
-    def consistant(self, color, assignment):
+    def consistant(self, color, node, assignment):
+        node.value = color
+        if not self.zig_zag(node, color) and self.start_finish_cons(node, color) and not self.cornered(node):
+            return True
+
+        node.value = '_'
+        return False
+
+    def zig_zag(self, node, color):
+        return False
+
+    def start_finish_cons(self, node, color):
+        for neighbor in node.neighbors:
+            if neighbor is self.start[color] or neighbor is self.finish[color]:
+                count = 0
+                for newneighbor in neighbor.neighbors:
+                    if newneighbor.value is color:
+                        count += 1
+                    if count >= 2:
+                        return False
         return True
+
+    def cornered(self, node):
+        for neighbor in node.neighbors:
+            if neighbor.value is not '_' and not self.cornered_util(neighbor):
+                return True
+        return False
+
+    def cornered_util(self, node):
+        for neighbor in node.neighbors:
+            if neighbor.value is '_' or neighbor.value is node.value:
+                return True
+        return False
 
 
 if __name__=='__main__':
@@ -97,7 +127,7 @@ if __name__=='__main__':
 
     #csp_test = CSP(["B", "R", "O", "Y", "G"], maze_test)
     csp_5x5 = CSP(["B", "R", "O", "Y", "G"], maze_5x5)
-    csp_5x5.dumb_backtracking(maze_test)
+    csp_5x5.dumb_backtracking(maze_5x5)
 
 
     #csp_7x7 = CSP(["B", "R", "O", "Y", "G"], maze_7x7)
