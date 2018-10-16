@@ -31,8 +31,8 @@ class CSP:
             return assignment
 
 
-        print("Evaluating: ")
-        mazes.print_maze(assignment)
+        #print("Evaluating: ")
+        #mazes.print_maze(assignment)
 
         node = self.get_node(assignment)
 
@@ -68,7 +68,7 @@ class CSP:
     def complete_util(self, color, assignment):
         node = assignment[self.start[color].x][self.start[color].y]
         path = []
-        while node.visited is False:
+        while node not in path:
             for neighbor in node.neighbors:
                 if neighbor is assignment[self.finish[color].x][self.finish[color].y]:
                     return True
@@ -81,6 +81,11 @@ class CSP:
         return False
 
     def consistant(self, color, node, assignment):
+
+
+        if self.color_complete(color, assignment):
+            return False
+
         node.value = color
         if not self.zig_zag(color) and self.start_finish_cons(node, color) and not self.cornered(node):
             return True
@@ -122,6 +127,21 @@ class CSP:
                 return True
         return False
 
+    def color_complete(self, color, assignment):
+        node = assignment[self.start[color].x][self.start[color].y]
+        path = []
+        while node not in path:
+            for neighbor in node.neighbors:
+                if neighbor is assignment[self.finish[color].x][self.finish[color].y]:
+                    return True
+                if neighbor.value is color and neighbor not in path:
+                    path.append(node)
+                    node = neighbor
+                    break
+                elif neighbor is node.neighbors[-1]:
+                    return False
+        return False
+
 
 if __name__=='__main__':
     #create mazes
@@ -135,12 +155,12 @@ if __name__=='__main__':
 
     #csp_test = CSP(["B", "R", "O", "Y", "G"], maze_test)
 
-    csp_5x5 = CSP(["B", "R", "O", "Y", "G"], maze_5x5)
-    csp_5x5.dumb_backtracking(maze_5x5)
+    #csp_5x5 = CSP(["B", "R", "O", "Y", "G"], maze_5x5)
+    #csp_5x5.dumb_backtracking(maze_5x5)
 
 
     csp_7x7 = CSP(["B", "R", "O", "Y", "G"], maze_7x7)
-    #csp_7x7.dumb_backtracking(maze_7x7)
+    csp_7x7.dumb_backtracking(maze_7x7)
 
     #csp_8x8 = CSP(["B", "R", "O", "Y", "G", "P", "Q"], maze_8x8)
 
