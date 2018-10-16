@@ -39,7 +39,7 @@ class CSP:
             return False
 
         for color in self.get_colors(node):
-            if self.consistant(color, node): #if the color we have chosen is legal, use it
+            if self.consistant(color, node, assignment): #if the color we have chosen is legal, use it
                 self.visited.append(node)
                 result = self.dumb_backtracking(assignment) #move on to next node
                 if result:
@@ -89,8 +89,15 @@ class CSP:
                     return False
         return False
 
-    def consistant(self, color, node):
+    def consistant(self, color, node, assignment):
         node.value = color
+
+        for color in self.domain:
+            if self.color_complete(color):
+                if self.islands(color, assignment):
+                    node.value = '_'
+                    return False
+
         #if the node will not cause a zig_zag, the start and finish node only have one child, and we dont corner any other nodes, move on
         if not self.zig_zag(color) and self.start_finish_cons(node, color) and not self.cornered(node):
             return True
@@ -121,10 +128,10 @@ class CSP:
         return True
 
     def cornered(self, node):
-        for neighbor in node.neighbors: #if any node has cornered a node, fail
+        for neighbor in node.neighbors: #checks to make sure all neighbors are partially complete
             if neighbor.value is not '_' and not self.cornered_util(neighbor):
                 return True
-        for color in self.domain:
+        for color in self.domain: #checks to make sure all colors are partially complete
             if not self.color_partcomplete(color):
                 return True
         return False
@@ -166,6 +173,24 @@ class CSP:
                     return False
         return False
 
+    def islands(self, color, assignment):
+        node = self.start[color]#checks to see if color is complete
+        path = []
+        while node not in path:
+            for neighbor in node.neighbors:
+                if neighbor is self.finish[color]:
+                    path.append(node)
+                    path.append(neighbor)
+                    for row in assignment:
+                        for n in row:
+                            if n.value is color and n not in path:
+                                return True
+                    return False
+                if neighbor.value is color and neighbor not in path:
+                    path.append(node)
+                    node = neighbor
+                    break
+        return False
 
 if __name__=='__main__':
     #create mazes
@@ -179,12 +204,12 @@ if __name__=='__main__':
 
     #csp_test = CSP(["B", "R", "O", "Y", "G"], maze_test)
 
-    csp_5x5 = CSP(["B", "R", "O", "Y", "G"], maze_5x5)
-    csp_5x5.dumb_backtracking(maze_5x5)
+    #csp_5x5 = CSP(["B", "R", "O", "Y", "G"], maze_5x5)
+    #csp_5x5.dumb_backtracking(maze_5x5)
 
 
-    #csp_7x7 = CSP(["B", "R", "O", "Y", "G"], maze_7x7)
-    #csp_7x7.dumb_backtracking(maze_7x7)
+    csp_7x7 = CSP(["B", "R", "O", "Y", "G"], maze_7x7)
+    csp_7x7.dumb_backtracking(maze_7x7)
 
     #csp_8x8 = CSP(["B", "R", "O", "Y", "G", "P", "Q"], maze_8x8)
 
