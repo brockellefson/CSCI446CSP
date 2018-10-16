@@ -14,53 +14,62 @@ class CSP:
         mazes.print_maze(maze)
 
 
-    def find_s_and_f(self, maze):
-        #find path for each color
+    def find_s_and_f(self, maze): #find start and finish to each color
         for row in maze:
             for node in row:
                 if node.value is not '_':
-                    self.visited.append(node)
+                    self.visited.append(node) #append to visited so their values do not change
                     if node.value not in self.start:
                         self.start[node.value] = node
                     else:
                         self.finish[node.value] = node
 
     def dumb_backtracking(self, assignment):
-        if self.complete(assignment):
+        if self.complete(assignment): #if the assignment is complete, return and print maze
             mazes.print_maze(assignment)
             return assignment
 
 
-        #print("Evaluating: ")
-        #mazes.print_maze(assignment)
+        print("Evaluating: ")
+        mazes.print_maze(assignment)
 
-        node = self.get_node(assignment)
+        node = self.get_node(assignment) #get a node that has not been visited
 
-        if node is None:
+        if node is None: #when all nodes have been visited but the assignment is not complete, instant fail
             return False
 
-        for color in self.domain:
-            if self.consistant(color, node, assignment):
+        for color in self.get_colors(node):
+            if self.consistant(color, node, assignment): #if the color we have chosen is legal, use it
                 self.visited.append(node)
-                result = self.dumb_backtracking(assignment)
+                result = self.dumb_backtracking(assignment) #move on to next node
                 if result:
                     return result
-                self.visited.remove(node)
+                self.visited.remove(node) #that branch failed, backtrack
                 node.value = '_'
         return False
 
     def backtracking(self, assignment):
         pass
 
+    def get_colors(self, node):
+        colors = [] #prioitizes adjacent colors
+        for neighbor in node.neighbors:
+            if neighbor.value is not '_' and neighbor.value not in colors:
+                colors.append(neighbor.value)
+        for color in self.domain:
+            if color not in colors:
+                colors.append(color)
+        return colors
+
     def get_node(self, assignment):
         for row in assignment:
             for node in row:
-                if node not in self.visited:
+                if node not in self.visited: #if node is not visited, return
                     return node
 
-    def complete(self, assignment):
+    def complete(self, assignment): #checks to see if assignment is correct
         for color in self.domain:
-            if not self.complete_util(color, assignment):
+            if not self.complete_util(color, assignment): #if each color is complete, the assignment is complete
                 return False
         print('Complete')
         return True
@@ -68,7 +77,7 @@ class CSP:
     def complete_util(self, color, assignment):
         node = assignment[self.start[color].x][self.start[color].y]
         path = []
-        while node not in path:
+        while node not in path: #for each neighbor at node, find the one with the same color as node, and traverse until finish is found
             for neighbor in node.neighbors:
                 if neighbor is assignment[self.finish[color].x][self.finish[color].y]:
                     return True
@@ -76,17 +85,16 @@ class CSP:
                     path.append(node)
                     node = neighbor
                     break
-                elif neighbor.value is '_' or neighbor is node.neighbors[-1]:
+                elif neighbor.value is '_' or neighbor is node.neighbors[-1]: #if finish is not found, the color is not complete
                     return False
         return False
 
     def consistant(self, color, node, assignment):
-
-
-        if self.color_complete(color, assignment):
+        if self.color_complete(color, assignment): #if the color is complete, fail
             return False
 
         node.value = color
+        #if the node will not cause a zig_zag, the start and finish node only have one child, and we dont corner any other nodes, move on
         if not self.zig_zag(color) and self.start_finish_cons(node, color) and not self.cornered(node):
             return True
 
@@ -94,7 +102,7 @@ class CSP:
         return False
 
     def zig_zag(self, color):
-        for node in self.visited:
+        for node in self.visited: #if any node has 3 or more neighbors with the same value, a zig_zag has occured
             if node.value is color:
                 count = 0
                 for neighbor in node.neighbors:
@@ -105,7 +113,7 @@ class CSP:
         return False
 
     def start_finish_cons(self, node, color):
-        for neighbor in node.neighbors:
+        for neighbor in node.neighbors: #if any start/finish node has more than one child, fail
             if neighbor is self.start[color] or neighbor is self.finish[color]:
                 count = 0
                 for newneighbor in neighbor.neighbors:
@@ -116,19 +124,19 @@ class CSP:
         return True
 
     def cornered(self, node):
-        for neighbor in node.neighbors:
+        for neighbor in node.neighbors: #if any node has cornered a node, fail
             if neighbor.value is not '_' and not self.cornered_util(neighbor):
                 return True
         return False
 
     def cornered_util(self, node):
-        for neighbor in node.neighbors:
+        for neighbor in node.neighbors: #if this node has no adjacent node that is either a '_' or the same color, then it is cornered
             if neighbor.value is '_' or neighbor.value is node.value:
                 return True
         return False
 
     def color_complete(self, color, assignment):
-        node = assignment[self.start[color].x][self.start[color].y]
+        node = assignment[self.start[color].x][self.start[color].y] #checks to see if color is complete
         path = []
         while node not in path:
             for neighbor in node.neighbors:
@@ -155,12 +163,12 @@ if __name__=='__main__':
 
     #csp_test = CSP(["B", "R", "O", "Y", "G"], maze_test)
 
-    #csp_5x5 = CSP(["B", "R", "O", "Y", "G"], maze_5x5)
-    #csp_5x5.dumb_backtracking(maze_5x5)
+    csp_5x5 = CSP(["B", "R", "O", "Y", "G"], maze_5x5)
+    csp_5x5.dumb_backtracking(maze_5x5)
 
 
-    csp_7x7 = CSP(["B", "R", "O", "Y", "G"], maze_7x7)
-    csp_7x7.dumb_backtracking(maze_7x7)
+    #csp_7x7 = CSP(["B", "R", "O", "Y", "G"], maze_7x7)
+    #csp_7x7.dumb_backtracking(maze_7x7)
 
     #csp_8x8 = CSP(["B", "R", "O", "Y", "G", "P", "Q"], maze_8x8)
 
