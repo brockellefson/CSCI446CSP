@@ -31,8 +31,8 @@ class CSP:
             return assignment
 
 
-        print("Evaluating: ")
-        mazes.print_maze(assignment)
+        #print("Evaluating: ")
+        #mazes.print_maze(assignment)
 
         node = self.get_node(assignment)
 
