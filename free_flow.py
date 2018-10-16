@@ -30,15 +30,15 @@ class CSP:
             return assignment
 
 
-        print("Evaluating: ")
-        mazes.print_maze(assignment)
+        #print("Evaluating: ")
+        #mazes.print_maze(assignment)
 
         node = self.get_node(assignment) #get a node that has not been visited
 
         if node is None: #when all nodes have been visited but the assignment is not complete, instant fail
             return False
 
-        for color in self.get_colors(node):
+        for color in self.get_colors(node, assignment):
             if self.consistant(color, node, assignment): #if the color we have chosen is legal, use it
                 self.visited.append(node)
                 result = self.dumb_backtracking(assignment) #move on to next node
@@ -51,13 +51,13 @@ class CSP:
     def backtracking(self, assignment):
         pass
 
-    def get_colors(self, node):
+    def get_colors(self, node, assignment):
         colors = [] #prioitizes adjacent colors
         for neighbor in node.neighbors:
-            if neighbor.value is not '_' and neighbor.value not in colors:
+            if neighbor.value is not '_' and neighbor.value not in colors and not self.color_complete(neighbor.value, assignment):
                 colors.append(neighbor.value)
         for color in self.domain:
-            if color not in colors:
+            if color not in colors and not self.color_complete(color, assignment):
                 colors.append(color)
         return colors
 
@@ -90,9 +90,6 @@ class CSP:
         return False
 
     def consistant(self, color, node, assignment):
-        if self.color_complete(color, assignment): #if the color is complete, fail
-            return False
-
         node.value = color
         #if the node will not cause a zig_zag, the start and finish node only have one child, and we dont corner any other nodes, move on
         if not self.zig_zag(color) and self.start_finish_cons(node, color) and not self.cornered(node):
@@ -130,7 +127,7 @@ class CSP:
         return False
 
     def cornered_util(self, node):
-        for neighbor in node.neighbors: #if this node has no adjacent node that is either a '_' or the same color, then it is cornered
+        for neighbor in node.neighbors: #if this node has no path to either a finish, start, or '_'
             if neighbor.value is '_' or neighbor.value is node.value:
                 return True
         return False
