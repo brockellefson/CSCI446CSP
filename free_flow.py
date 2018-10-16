@@ -38,8 +38,8 @@ class CSP:
         if node is None: #when all nodes have been visited but the assignment is not complete, instant fail
             return False
 
-        for color in self.get_colors(node, assignment):
-            if self.consistant(color, node, assignment): #if the color we have chosen is legal, use it
+        for color in self.get_colors(node):
+            if self.consistant(color, node): #if the color we have chosen is legal, use it
                 self.visited.append(node)
                 result = self.dumb_backtracking(assignment) #move on to next node
                 if result:
@@ -51,13 +51,13 @@ class CSP:
     def backtracking(self, assignment):
         pass
 
-    def get_colors(self, node, assignment):
+    def get_colors(self, node):
         colors = [] #prioitizes adjacent colors
         for neighbor in node.neighbors:
-            if neighbor.value is not '_' and neighbor.value not in colors and not self.color_complete(neighbor.value, assignment):
+            if neighbor.value is not '_' and neighbor.value not in colors and not self.color_complete(neighbor.value):
                 colors.append(neighbor.value)
         for color in self.domain:
-            if color not in colors and not self.color_complete(color, assignment):
+            if color not in colors and not self.color_complete(color):
                 colors.append(color)
         return colors
 
@@ -89,7 +89,7 @@ class CSP:
                     return False
         return False
 
-    def consistant(self, color, node, assignment):
+    def consistant(self, color, node):
         node.value = color
         #if the node will not cause a zig_zag, the start and finish node only have one child, and we dont corner any other nodes, move on
         if not self.zig_zag(color) and self.start_finish_cons(node, color) and not self.cornered(node):
@@ -135,12 +135,12 @@ class CSP:
                 return True
         return False
 
-    def color_complete(self, color, assignment):
-        node = assignment[self.start[color].x][self.start[color].y] #checks to see if color is complete
+    def color_complete(self, color):
+        node = self.start[color]#checks to see if color is complete
         path = []
         while node not in path:
             for neighbor in node.neighbors:
-                if neighbor is assignment[self.finish[color].x][self.finish[color].y]:
+                if neighbor is self.finish[color]:
                     return True
                 if neighbor.value is color and neighbor not in path:
                     path.append(node)
