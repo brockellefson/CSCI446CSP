@@ -124,10 +124,13 @@ class CSP:
         for neighbor in node.neighbors: #if any node has cornered a node, fail
             if neighbor.value is not '_' and not self.cornered_util(neighbor):
                 return True
+        for color in self.domain:
+            if not self.color_partcomplete(color):
+                return True
         return False
 
     def cornered_util(self, node):
-        for neighbor in node.neighbors: #if this node has no path to either a finish, start, or '_'
+        for neighbor in node.neighbors: #if this node has no path to either a color or '_'
             if neighbor.value is '_' or neighbor.value is node.value:
                 return True
         return False
@@ -143,6 +146,22 @@ class CSP:
                     path.append(node)
                     node = neighbor
                     break
+                elif neighbor is node.neighbors[-1]:
+                    return False
+        return False
+
+    def color_partcomplete(self, color):
+        node = self.start[color] #checks to see if color is part complete
+        path = []
+        while node not in path:
+            for neighbor in node.neighbors:
+                if neighbor is self.finish[color] or neighbor.value is '_':
+                    return True
+                if neighbor.value is color and neighbor not in path:
+                    path.append(node)
+                    node = neighbor
+                    break
+
                 elif neighbor is node.neighbors[-1]:
                     return False
         return False
