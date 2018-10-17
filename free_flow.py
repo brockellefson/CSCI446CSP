@@ -29,16 +29,15 @@ class CSP:
             mazes.print_maze(assignment)
             return assignment
 
-
-        #print("Evaluating: ")
-        #mazes.print_maze(assignment)
-
         node = self.get_node(assignment) #get a node that has not been visited
 
         if node is None: #when all nodes have been visited but the assignment is not complete, instant fail
             return False
 
-        #print("x: {}, y: {}\n".format(node.x, node.y))
+        #print("Evaluating: ")
+        #print("node is at x: {} y:{}".format(node.x, node.y))
+        #mazes.print_maze(assignment)
+
 
         for color in self.get_colors(node):
             if self.consistant(color, node, assignment): #if the color we have chosen is legal, use it
@@ -100,37 +99,25 @@ class CSP:
         #            node.value = '_'
         #            return False
 
-        #if self.zig_zag(node, assignment):
-        #    node.value = '_'
-        #    return False
-
-
-        for color in self.domain: #checks to make sure all colors are partially complete
-            if not self.color_partcomplete(color):
-                node.value = '_'
-                return False
-
         #if the node will not cause a zig_zag, the start and finish node only have one child, and we dont corner any other nodes, move on
         for neighbor in node.neighbors:
             if neighbor.value is not '_':
-                if not self.start_finish_cons(neighbor, color) or self.cornered(neighbor):
+                if self.zig_zag(neighbor, color) or not self.start_finish_cons(neighbor, color) or self.cornered(neighbor) or not self.color_partcomplete_start(neighbor.value) or not self.color_partcomplete_finish(neighbor.value):
                     node.value = '_'
                     return False
 
 
         return True
 
-    def zig_zag(self, node, assignment):
-        x = node.x
-        y = node.y
-
-        color = node.value
-        if assignment[x-1][y].value is color and assignment[x][y-1].value is color and assignment[x-1][y-1].value is color:
-            return False
-        elif assignment[x+1][y].value is color and assignment[x][y-1].value is color and assignment[x-1][y-1].value is color:
-            return False
-
-        return True
+    def zig_zag(self, node, color):
+        if node.value is color:
+            count = 0
+            for neighbor in node.neighbors:
+                if neighbor.value is color:
+                    count += 1
+                if count > 2:
+                    return True
+        return False
 
     def start_finish_cons(self, node, color):
         if node is self.start[color] or node is self.finish[color]:
@@ -156,19 +143,17 @@ class CSP:
     def color_complete(self, color):
         node = self.start[color]#checks to see if color is complete
         path = []
-        while node not in path:
+        while node is not self.finish[color]:
             for neighbor in node.neighbors:
-                if neighbor is self.finish[color]:
-                    return True
                 if neighbor.value is color and neighbor not in path:
                     path.append(node)
                     node = neighbor
                     break
                 elif neighbor is node.neighbors[-1]:
                     return False
-        return False
+        return True
 
-    def color_partcomplete(self, color):
+    def color_partcomplete_start(self, color):
         node = self.start[color] #checks to see if color is part complete
         path = []
         while node not in path:
@@ -184,24 +169,24 @@ class CSP:
                     return False
         return False
 
-    def islands(self, color, assignment):
-        node = self.start[color]#checks to see if color is complete
+    def color_partcomplete_finish(self, color):
+        node = self.finish[color] #checks to see if color is part complete
         path = []
         while node not in path:
             for neighbor in node.neighbors:
-                if neighbor is self.finish[color]:
-                    path.append(node)
-                    path.append(neighbor)
-                    for row in assignment:
-                        for n in row:
-                            if n.value is color and n not in path:
-                                return True
-                    return False
+                if neighbor is self.start[color] or neighbor.value is '_':
+                    return True
                 if neighbor.value is color and neighbor not in path:
                     path.append(node)
                     node = neighbor
                     break
+
+                elif neighbor is node.neighbors[-1]:
+                    return False
         return False
+
+    def islands(self, color, assignment):
+        pass
 
 if __name__=='__main__':
     #create mazes
