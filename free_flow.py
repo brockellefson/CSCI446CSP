@@ -10,6 +10,8 @@ class CSP:
         self.finish = {}
         self.start = {}
         self.visited = []
+        self.color_visited = defaultdict(list)
+        self.island = []
         self.complete_colors = []
         self.find_s_and_f(maze)
         mazes.print_maze(maze)
@@ -22,8 +24,10 @@ class CSP:
                     self.visited.append(node) #append to visited so their values do not change
                     if node.value not in self.start:
                         self.start[node.value] = node
+                        self.color_visited[node.value].append(node)
                     else:
                         self.finish[node.value] = node
+                        self.color_visited[node.value].append(node)
 
     def dumb_backtracking(self, assignment):
         if self.complete(assignment): #if the assignment is complete, return and print maze
@@ -38,15 +42,22 @@ class CSP:
         #print("Evaluating: ")
         #print("node is at x: {} y:{}".format(node.x, node.y))
         #mazes.print_maze(assignment)
-
+        if len(self.island) > 0:
+            for icolor in self.island:
+                if self.has_island(icolor, self.color_visited[icolor]):
+                    return False
+                else:
+                    self.island.remove(icolor)
 
         for color in self.get_colors(node):
             if self.consistant(color, node, assignment): #if the color we have chosen is legal, use it
                 self.visited.append(node)
+                self.color_visited[color].append(node)
                 result = self.dumb_backtracking(assignment) #move on to next node
                 if result:
                     return result
                 self.visited.remove(node) #that branch failed, backtrack
+                self.color_visited[color].remove(node)
                 if color in self.complete_colors:
                     self.complete_colors.remove(color)
                 node.value = '_'
@@ -96,12 +107,6 @@ class CSP:
     def consistant(self, color, node, assignment):
         node.value = color
 
-        #for color in self.domain:
-        #    if self.color_complete(color):
-        #        if self.islands(color, assignment):
-        #            node.value = '_'
-        #            return False
-
         #if the node will not cause a zig_zag, the start and finish node only have one child, and we dont corner any other nodes, move on
         for neighbor in node.neighbors:
             if neighbor.value is not '_':
@@ -109,10 +114,11 @@ class CSP:
                     node.value = '_'
                     return False
 
-        if self.color_complete(color):
+        local_complete, path = self.color_complete(color)
+        if local_complete:
             self.complete_colors.append(color)
-
-
+            if self.has_island(color, path):
+                self.island.append(color)
         return True
 
     def zig_zag(self, node, color):
@@ -156,8 +162,8 @@ class CSP:
                     node = neighbor
                     break
                 elif neighbor is node.neighbors[-1]:
-                    return False
-        return True
+                    return False, path
+        return True, path
 
     def color_partcomplete_start(self, color):
         node = self.start[color] #checks to see if color is part complete
@@ -191,8 +197,11 @@ class CSP:
                     return False
         return False
 
-    def islands(self, color, assignment):
-        pass
+    def has_island(self, color, path):
+        for node in self.color_visited[color]:
+            if node not in path:
+                return True
+        return False
 
 if __name__=='__main__':
     #create mazes
@@ -210,9 +219,11 @@ if __name__=='__main__':
     #csp_5x5.dumb_backtracking(maze_5x5)
 
 
-    csp_7x7 = CSP(["B", "R", "O", "Y", "G"], maze_7x7)
-    csp_7x7.dumb_backtracking(maze_7x7)
+    #csp_7x7 = CSP(["B", "R", "O", "Y", "G"], maze_7x7)
+    #csp_7x7.dumb_backtracking(maze_7x7)
 
     #csp_8x8 = CSP(["B", "R", "O", "Y", "G", "P", "Q"], maze_8x8)
+    #csp_8x8.dumb_backtracking(maze_8x8)
 
-    #csp_9x9 = CSP(["B", "R", "O", "Y", "G", "P", "Q", "D", "K"], maze_9x9)
+    csp_9x9 = CSP(["B", "R", "O", "Y", "G", "P", "Q", "D", "K"], maze_9x9)
+    csp_9x9.dumb_backtracking(maze_9x9)
