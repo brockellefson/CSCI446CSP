@@ -38,6 +38,8 @@ class CSP:
         if node is None: #when all nodes have been visited but the assignment is not complete, instant fail
             return False
 
+        #print("x: {}, y: {}\n".format(node.x, node.y))
+
         for color in self.get_colors(node):
             if self.consistant(color, node, assignment): #if the color we have chosen is legal, use it
                 self.visited.append(node)
@@ -92,48 +94,57 @@ class CSP:
     def consistant(self, color, node, assignment):
         node.value = color
 
-        for color in self.domain:
-            if self.color_complete(color):
-                if self.islands(color, assignment):
+        #for color in self.domain:
+        #    if self.color_complete(color):
+        #        if self.islands(color, assignment):
+        #            node.value = '_'
+        #            return False
+
+        #if self.zig_zag(node, assignment):
+        #    node.value = '_'
+        #    return False
+
+
+        for color in self.domain: #checks to make sure all colors are partially complete
+            if not self.color_partcomplete(color):
+                node.value = '_'
+                return False
+
+        #if the node will not cause a zig_zag, the start and finish node only have one child, and we dont corner any other nodes, move on
+        for neighbor in node.neighbors:
+            if neighbor.value is not '_':
+                if not self.start_finish_cons(neighbor, color) or self.cornered(neighbor):
                     node.value = '_'
                     return False
 
-        #if the node will not cause a zig_zag, the start and finish node only have one child, and we dont corner any other nodes, move on
-        if not self.zig_zag(color) and self.start_finish_cons(node, color) and not self.cornered(node):
-            return True
 
-        node.value = '_'
-        return False
+        return True
 
-    def zig_zag(self, color):
-        for node in self.visited: #if any node has 3 or more neighbors with the same value, a zig_zag has occured
-            if node.value is color:
-                count = 0
-                for neighbor in node.neighbors:
-                    if neighbor.value is color:
-                        count += 1
-                    if count >= 3:
-                        return True
-        return False
+    def zig_zag(self, node, assignment):
+        x = node.x
+        y = node.y
+
+        color = node.value
+        if assignment[x-1][y].value is color and assignment[x][y-1].value is color and assignment[x-1][y-1].value is color:
+            return False
+        elif assignment[x+1][y].value is color and assignment[x][y-1].value is color and assignment[x-1][y-1].value is color:
+            return False
+
+        return True
 
     def start_finish_cons(self, node, color):
-        for neighbor in node.neighbors: #if any start/finish node has more than one child, fail
-            if neighbor is self.start[color] or neighbor is self.finish[color]:
-                count = 0
-                for newneighbor in neighbor.neighbors:
-                    if newneighbor.value is color:
-                        count += 1
-                    if count >= 2:
-                        return False
+        if node is self.start[color] or node is self.finish[color]:
+            count = 0
+            for neighbor in node.neighbors:
+                if neighbor.value is color:
+                    count += 1
+                if count >= 2:
+                    return False
         return True
 
     def cornered(self, node):
-        for neighbor in node.neighbors: #checks to make sure all neighbors are partially complete
-            if neighbor.value is not '_' and not self.cornered_util(neighbor):
-                return True
-        for color in self.domain: #checks to make sure all colors are partially complete
-            if not self.color_partcomplete(color):
-                return True
+        if not self.cornered_util(node):
+            return True
         return False
 
     def cornered_util(self, node):
