@@ -5,8 +5,8 @@ import random
 
 
 class CSP:
-    def __init__(self, domain, maze):
-        self.domain = domain
+    def __init__(self, maze):
+        self.domain = []
         self.finish = {}
         self.start = {}
         self.visited = []
@@ -22,6 +22,8 @@ class CSP:
             for node in row:
                 if node.value is not '_':
                     self.visited.append(node) #append to visited so their values do not change
+                    if node.value not in self.domain:
+                        self.domain.append(node.value)
                     if node.value not in self.start:
                         self.start[node.value] = node
                         self.color_visited[node.value].append(node)
@@ -210,20 +212,34 @@ if __name__=='__main__':
     maze_7x7 = mazes.read_maze("7x7maze.txt")
     maze_8x8 = mazes.read_maze("8x8maze.txt")
     maze_9x9 = mazes.read_maze("9x9maze.txt")
-    maze_test = mazes.read_maze("5x5maze_solution.txt")
+    maze_10x10 = mazes.read_maze("10x10maze.txt")
+    maze_12x12 = mazes.read_maze("12x12maze.txt")
+    maze_14x14 = mazes.read_maze("14x14maze.txt")
 
+    print("Solving 5x5:")
+    csp_5x5 = CSP(maze_5x5)
+    csp_5x5.dumb_backtracking(maze_5x5)
 
-    #csp_test = CSP(["B", "R", "O", "Y", "G"], maze_test)
+    print("Solving 7x7:")
+    csp_7x7 = CSP(maze_7x7)
+    csp_7x7.dumb_backtracking(maze_7x7)
 
-    #csp_5x5 = CSP(["B", "R", "O", "Y", "G"], maze_5x5)
-    #csp_5x5.dumb_backtracking(maze_5x5)
+    print("Solving 8x8:")
+    csp_8x8 = CSP(maze_8x8)
+    csp_8x8.dumb_backtracking(maze_8x8)
 
-
-    #csp_7x7 = CSP(["B", "R", "O", "Y", "G"], maze_7x7)
-    #csp_7x7.dumb_backtracking(maze_7x7)
-
-    #csp_8x8 = CSP(["B", "R", "O", "Y", "G", "P", "Q"], maze_8x8)
-    #csp_8x8.dumb_backtracking(maze_8x8)
-
-    csp_9x9 = CSP(["B", "R", "O", "Y", "G", "P", "Q", "D", "K"], maze_9x9)
+    print("Solving 9x9:")
+    csp_9x9 = CSP(maze_9x9)
     csp_9x9.dumb_backtracking(maze_9x9)
+
+    print("Solving 10x10:")
+    csp_10x10 = CSP(maze_10x10)
+    csp_10x10.dumb_backtracking(maze_10x10)
+
+    print("Solving 12x12:")
+    csp_12x12 = CSP(maze_12x12)
+    csp_12x12.dumb_backtracking(maze_12x12)
+
+    print("Solving 14x14:")
+    csp_14x14 = CSP(maze_14x14)
+    csp_14x14.dumb_backtracking(maze_14x14)
