@@ -86,25 +86,10 @@ class CSP:
 
     def complete(self, assignment): #checks to see if assignment is correct
         for color in self.domain:
-            if not self.complete_util(color, assignment): #if each color is complete, the assignment is complete
+            if color not in self.complete_colors:
                 return False
         print('Complete')
         return True
-
-    def complete_util(self, color, assignment):
-        node = assignment[self.start[color].x][self.start[color].y]
-        path = []
-        while node not in path: #for each neighbor at node, find the one with the same color as node, and traverse until finish is found
-            for neighbor in node.neighbors:
-                if neighbor is assignment[self.finish[color].x][self.finish[color].y]:
-                    return True
-                if neighbor.value is color and neighbor not in path:
-                    path.append(node)
-                    node = neighbor
-                    break
-                elif neighbor.value is '_' or neighbor is node.neighbors[-1]: #if finish is not found, the color is not complete
-                    return False
-        return False
 
     def consistant(self, color, node, assignment):
         node.value = color
