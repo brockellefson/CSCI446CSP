@@ -10,6 +10,7 @@ class CSP:
         self.finish = {}
         self.start = {}
         self.visited = []
+        self.complete_colors = []
         self.find_s_and_f(maze)
         mazes.print_maze(maze)
 
@@ -46,6 +47,8 @@ class CSP:
                 if result:
                     return result
                 self.visited.remove(node) #that branch failed, backtrack
+                if color in self.complete_colors:
+                    self.complete_colors.remove(color)
                 node.value = '_'
         return False
 
@@ -55,10 +58,10 @@ class CSP:
     def get_colors(self, node):
         colors = [] #prioitizes adjacent colors
         for neighbor in node.neighbors:
-            if neighbor.value is not '_' and neighbor.value not in colors and not self.color_complete(neighbor.value):
+            if neighbor.value is not '_' and neighbor.value not in colors and neighbor.value not in self.complete_colors:
                 colors.append(neighbor.value)
         for color in self.domain:
-            if color not in colors and not self.color_complete(color):
+            if color not in colors and color not in self.complete_colors:
                 colors.append(color)
         return colors
 
@@ -105,6 +108,9 @@ class CSP:
                 if self.zig_zag(neighbor, color) or not self.start_finish_cons(neighbor, color) or self.cornered(neighbor) or not self.color_partcomplete_start(neighbor.value) or not self.color_partcomplete_finish(neighbor.value):
                     node.value = '_'
                     return False
+
+        if self.color_complete(color):
+            self.complete_colors.append(color)
 
 
         return True
