@@ -43,13 +43,6 @@ class CSP:
         if node is None: #when all nodes have been visited but the assignment is not complete, instant fail
             return False
 
-        if len(self.island) > 0:
-            for icolor in self.island:
-                if self.has_island(icolor, self.finish_path[icolor]):
-                    return False
-                else:
-                    self.island.remove(icolor)
-
         for color in self.get_colors(node):
 
             if self.debug:
@@ -61,13 +54,9 @@ class CSP:
                 mazes.print_maze(assignment)
                 node.value = '_'
 
-
             if self.consistant(color, node, assignment): #if the color we have chosen is legal, use it
                 self.visited.append(node)
                 self.color_visited[color].append(node)
-                if color in self.complete_colors:
-                    if self.has_island(color, self.finish_path[color]):
-                        self.island.append(color)
 
                 result = self.dumb_backtracking(assignment) #move on to next node
                 if result:
@@ -196,12 +185,6 @@ class CSP:
                     return False
         return False
 
-    def has_island(self, color, path):
-        for node in self.color_visited[color]:
-            if node not in path:
-                return True
-        return False
-
 if __name__=='__main__':
     #create mazes
     maze_test = mazes.read_maze("5x5maze_solution.txt")
@@ -230,13 +213,13 @@ if __name__=='__main__':
     csp_9x9.dumb_backtracking(maze_9x9)
 
     print("Solving 10x10:")
-    csp_10x10 = CSP(maze_10x10, True)
+    csp_10x10 = CSP(maze_10x10, False)
     csp_10x10.dumb_backtracking(maze_10x10)
 
-    #print("Solving 12x12:")
-    #csp_12x12 = CSP(maze_12x12, False)
-    #csp_12x12.dumb_backtracking(maze_12x12)
+    print("Solving 12x12:")
+    csp_12x12 = CSP(maze_12x12, True)
+    csp_12x12.dumb_backtracking(maze_12x12)
 
-    #print("Solving 14x14:")
-    #csp_14x14 = CSP(maze_14x14, False)
-    #csp_14x14.dumb_backtracking(maze_14x14)
+    print("Solving 14x14:")
+    csp_14x14 = CSP(maze_14x14, False)
+    csp_14x14.dumb_backtracking(maze_14x14)
