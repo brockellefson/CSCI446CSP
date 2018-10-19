@@ -134,9 +134,19 @@ class CSP:
         return True
 
     def cornered(self, node):
-        for neighbor in node.neighbors: #if this node has no path to either a color or '_'
-            if neighbor.value is '_' or neighbor.value is node.value:
-                return False
+        color = node.value
+        path = []
+        while node not in path:
+            for neighbor in node.neighbors:
+                if neighbor.value is '_' or neighbor is self.finish[color] or neighbor is self.start[color]:
+                    return False
+                if neighbor.value is color and neighbor not in path:
+                    path.append(node)
+                    node = neighbor
+                    break
+
+                elif neighbor is node.neighbors[-1]:
+                    return True
         return True
 
     def color_complete(self, color):
@@ -217,7 +227,7 @@ if __name__=='__main__':
     csp_10x10.dumb_backtracking(maze_10x10)
 
     print("Solving 12x12:")
-    csp_12x12 = CSP(maze_12x12, True)
+    csp_12x12 = CSP(maze_12x12, False)
     csp_12x12.dumb_backtracking(maze_12x12)
 
     print("Solving 14x14:")
