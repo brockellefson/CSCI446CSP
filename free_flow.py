@@ -10,9 +10,6 @@ class CSP:
         self.finish = {}
         self.start = {}
         self.visited = []
-        self.color_visited = defaultdict(list)
-        self.finish_path = defaultdict(list)
-        self.island = []
         self.complete_colors = []
         self.debug = debug
         self.find_s_and_f(maze)
@@ -29,10 +26,8 @@ class CSP:
                         self.domain.append(node.value)
                     if node.value not in self.start:
                         self.start[node.value] = node
-                        self.color_visited[node.value].append(node)
                     else:
                         self.finish[node.value] = node
-                        self.color_visited[node.value].append(node)
 
     def dumb_backtracking(self, assignment):
         if self.complete(assignment): #if the assignment is complete, return and print maze
@@ -57,14 +52,12 @@ class CSP:
 
             if self.consistant(color, node, assignment): #if the color we have chosen is legal, use it
                 self.visited.append(node)
-                self.color_visited[color].append(node)
 
                 result = self.dumb_backtracking(assignment) #move on to next node
                 if result:
                     return result
 
                 self.visited.remove(node) #that branch failed, backtrack
-                self.color_visited[color].remove(node)
                 if color in self.complete_colors:
                     self.complete_colors.remove(color)
 
@@ -123,7 +116,6 @@ class CSP:
 
         local_complete, path = self.color_complete(color)
         if local_complete:
-            self.finish_path[color] = path
             self.complete_colors.append(color)
 
         return True
