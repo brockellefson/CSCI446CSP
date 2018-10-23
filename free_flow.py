@@ -2,7 +2,7 @@ from collections import defaultdict
 import heapq
 import mazes
 import random
-
+import constraints
 
 class CSP:
     def __init__(self, maze, debug):
@@ -17,6 +17,7 @@ class CSP:
         self.debug = debug
         self.find_s_and_f(maze)
         mazes.print_maze(maze)
+        self.c = constraints.Constraints(self.start, self.finish)
 
 
     def find_s_and_f(self, maze): #find start and finish to each color
@@ -96,59 +97,6 @@ class CSP:
         print('Complete')
         return True
 
-    def consistant(self, color, node, assignment):
-        node.value = color
-
-        #if the node will not cause a zig_zag, the start and finish node only have one child, and we dont corner any other nodes, move on
-        for neighbor in node.neighbors:
-            if neighbor.value is not '_':
-                if self.zig_zag(neighbor, color) or not self.start_finish_cons(neighbor, color) or self.cornered(neighbor) or not self.color_partcomplete_start(neighbor.value) or not self.color_partcomplete_finish(neighbor.value):
-                    node.value = '_'
-                    return False
-
-        local_complete, path = self.color_complete(color)
-        if local_complete:
-            self.finish_path[color] = path
-            self.complete_colors.append(color)
-
-        return True
-
-    def zig_zag(self, node, color):
-        if node.value is color:
-            count = 0
-            for neighbor in node.neighbors:
-                if neighbor.value is color:
-                    count += 1
-                if count > 2:
-                    return True
-        return False
-
-    def start_finish_cons(self, node, color):
-        if node is self.start[color] or node is self.finish[color]:
-            count = 0
-            for neighbor in node.neighbors:
-                if neighbor.value is color:
-                    count += 1
-                if count >= 2:
-                    return False
-        return True
-
-    def cornered(self, node):
-        color = node.value
-        path = []
-        while node not in path:
-            for neighbor in node.neighbors:
-                if neighbor.value is '_' or neighbor is self.finish[color] or neighbor is self.start[color]:
-                    return False
-                if neighbor.value is color and neighbor not in path:
-                    path.append(node)
-                    node = neighbor
-                    break
-
-                elif neighbor is node.neighbors[-1]:
-                    return True
-        return True
-
     def color_complete(self, color):
         node = self.start[color]#checks to see if color is complete
         path = []
@@ -163,37 +111,22 @@ class CSP:
         path.append(node)
         return True, path
 
-    def color_partcomplete_start(self, color):
-        node = self.start[color] #checks to see if color is part complete
-        path = []
-        while node not in path:
-            for neighbor in node.neighbors:
-                if neighbor is self.finish[color] or neighbor.value is '_':
-                    return True
-                if neighbor.value is color and neighbor not in path:
-                    path.append(node)
-                    node = neighbor
-                    break
+    def consistant(self, color, node, assignment):
+        node.value = color
 
-                elif neighbor is node.neighbors[-1]:
+        #if the node will not cause a zig_zag, the start and finish node only have one child, and we dont corner any other nodes, move on
+        for neighbor in node.neighbors:
+            if neighbor.value is not '_':
+                if self.c.zig_zag(neighbor, color) or not self.c.start_finish_cons(neighbor, color) or self.c.cornered(neighbor) or not self.c.color_partcomplete_start(neighbor.value) or not self.c.color_partcomplete_finish(neighbor.value):
+                    node.value = '_'
                     return False
-        return False
 
-    def color_partcomplete_finish(self, color):
-        node = self.finish[color] #checks to see if color is part complete
-        path = []
-        while node not in path:
-            for neighbor in node.neighbors:
-                if neighbor is self.start[color] or neighbor.value is '_':
-                    return True
-                if neighbor.value is color and neighbor not in path:
-                    path.append(node)
-                    node = neighbor
-                    break
+        local_complete, path = self.color_complete(color)
+        if local_complete:
+            self.finish_path[color] = path
+            self.complete_colors.append(color)
 
-                elif neighbor is node.neighbors[-1]:
-                    return False
-        return False
+        return True
 
 if __name__=='__main__':
     #create mazes
