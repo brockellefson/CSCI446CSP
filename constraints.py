@@ -10,19 +10,14 @@ class Constraints:
             for neighbor in node.neighbors:
                 if neighbor.value is color:
                     count += 1
-                if count > 2:
+
+                if node is self.start[color] or node is self.finish[color]:
+                    if count >= 2:
+                        return True
+
+                elif count > 2:
                     return True
         return False
-
-    def start_finish_cons(self, node, color):
-        if node is self.start[color] or node is self.finish[color]:
-            count = 0
-            for neighbor in node.neighbors:
-                if neighbor.value is color:
-                    count += 1
-                if count >= 2:
-                    return False
-        return True
 
     def cornered(self, node):
         color = node.value

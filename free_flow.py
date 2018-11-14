@@ -107,7 +107,7 @@ class CSP:
         #if the node will not cause a zig_zag, the start and finish node only have one child, and we dont corner any other nodes, move on
         for neighbor in node.neighbors:
             if neighbor.value is not '_':
-                if self.c.zig_zag(neighbor, color) or not self.c.start_finish_cons(neighbor, color) or self.c.cornered(neighbor) or not self.c.color_partcomplete_start(neighbor.value) or not self.c.color_partcomplete_finish(neighbor.value):
+                if self.c.zig_zag(neighbor, color) or self.c.cornered(neighbor) or not self.c.color_partcomplete_start(neighbor.value) or not self.c.color_partcomplete_finish(neighbor.value):
                     node.value = '_'
                     return False
 
