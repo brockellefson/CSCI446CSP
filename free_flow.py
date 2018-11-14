@@ -111,8 +111,7 @@ class CSP:
                     node.value = '_'
                     return False
 
-        local_complete = self.color_complete(color)
-        if local_complete:
+        if self.color_complete(color):
             self.complete_colors.append(color)
 
         return True
