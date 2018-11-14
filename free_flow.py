@@ -38,14 +38,12 @@ class CSP:
 
         if node is None: #when all nodes have been visited but the assignment is not complete, instant fail
             return False
-
         for color in self.get_colors(node):
 
             if self.debug:
                 print("Evaluating: ")
                 print("Domain is :{}".format(self.get_colors(node)))
                 print("node is at x: {} y:{}".format(node.x, node.y))
-                print("islands are: {}\ncomplete are: {}".format(self.island, self.complete_colors))
                 node.value = 'X'
                 mazes.print_maze(assignment)
                 node.value = '_'
@@ -152,9 +150,5 @@ if __name__=='__main__':
     csp_10x10.dumb_backtracking(maze_10x10)
 
     print("Solving 12x12:")
-    csp_12x12 = CSP(maze_12x12, False)
+    csp_12x12 = CSP(maze_12x12, True)
     csp_12x12.dumb_backtracking(maze_12x12)
-
-    print("Solving 14x14:")
-    csp_14x14 = CSP(maze_14x14, False)
-    csp_14x14.dumb_backtracking(maze_14x14)
