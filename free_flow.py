@@ -98,9 +98,8 @@ class CSP:
                     node = neighbor
                     break
                 elif neighbor is node.neighbors[-1]:
-                    return False, path
-        path.append(node)
-        return True, path
+                    return False
+        return True
 
     def consistant(self, color, node, assignment):
         node.value = color
@@ -112,7 +111,7 @@ class CSP:
                     node.value = '_'
                     return False
 
-        local_complete, path = self.color_complete(color)
+        local_complete = self.color_complete(color)
         if local_complete:
             self.complete_colors.append(color)
 
@@ -120,14 +119,12 @@ class CSP:
 
 if __name__=='__main__':
     #create mazes
-    maze_test = mazes.read_maze("5x5maze_solution.txt")
     maze_5x5 = mazes.read_maze("5x5maze.txt")
     maze_7x7 = mazes.read_maze("7x7maze.txt")
     maze_8x8 = mazes.read_maze("8x8maze.txt")
     maze_9x9 = mazes.read_maze("9x9maze.txt")
     maze_10x10 = mazes.read_maze("10x10maze.txt")
     maze_12x12 = mazes.read_maze("12x12maze.txt")
-    maze_14x14 = mazes.read_maze("14x14maze.txt")
 
     print("Solving 5x5:")
     csp_5x5 = CSP(maze_5x5, False)
@@ -150,5 +147,5 @@ if __name__=='__main__':
     csp_10x10.dumb_backtracking(maze_10x10)
 
     print("Solving 12x12:")
-    csp_12x12 = CSP(maze_12x12, True)
+    csp_12x12 = CSP(maze_12x12, False)
     csp_12x12.dumb_backtracking(maze_12x12)

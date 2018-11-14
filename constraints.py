@@ -26,6 +26,10 @@ class Constraints:
 
     def cornered(self, node):
         color = node.value
+
+        if node is self.finish[color] or node is self.start[color]:
+            return False
+
         path = []
         while node not in path:
             for neighbor in node.neighbors:
