@@ -51,6 +51,8 @@ class CSP:
                 node.value = '_'
 
             if self.consistant(color, node, assignment): #if the color we have chosen is legal, use it
+                if self.color_complete(color):
+                    self.complete_colors.append(color)
                 self.visited.append(node)
 
                 result = self.dumb_backtracking(assignment) #move on to next node
@@ -91,7 +93,7 @@ class CSP:
             if self.color_complete(color):
                 self.complete_colors.append(color)
 
-            result = self.dumb_backtracking(assignment) #move on to next node
+            result = self.backtracking(assignment) #move on to next node
             if result:
                 return result
 
@@ -112,17 +114,15 @@ class CSP:
                     legal_colors = []
                     for color in self.domain:
                         if color not in self.complete_colors:
-                            node.value = color
-                        for neighbor in node.neighbors:
-                            if neighbor.value is not '_':
-                                if not self.c.zig_zag(neighbor, color) and not self.c.cornered(neighbor) and self.c.color_partcomplete_start(neighbor.value) and self.c.color_partcomplete_finish(neighbor.value):
-                                    legal_colors.append(color) #if that colors does not violate any constraints, add it
-                    node.value = '_'
-                    if len(legal_colors) is 1: #if a node only has one legal move, automaticaly pick that one
+                            if self.consistant(color, node, assignment):
+                                node.value = '_'
+                                legal_colors.append(color)
+                    if len(legal_colors) is 1:
                         return legal_colors, node
                     else:
                         heapq.heappush(variable_values, (len(legal_colors), id, legal_colors, node))
                         id += 1
+
         curr_node = heapq.heappop(variable_values)
         return curr_node[2], curr_node[3]
 
@@ -172,10 +172,6 @@ class CSP:
                 if self.c.zig_zag(neighbor, color) or self.c.cornered(neighbor) or not self.c.color_partcomplete_start(neighbor.value) or not self.c.color_partcomplete_finish(neighbor.value):
                     node.value = '_'
                     return False
-
-        if self.color_complete(color):
-            self.complete_colors.append(color)
-
         return True
 
 if __name__=='__main__':
@@ -189,24 +185,30 @@ if __name__=='__main__':
 
     print("Solving 5x5:")
     csp_5x5 = CSP(maze_5x5, False)
+    #csp_5x5.dumb_backtracking(maze_5x5)
     csp_5x5.backtracking(maze_5x5)
 
     print("Solving 7x7:")
     csp_7x7 = CSP(maze_7x7, False)
+    #csp_7x7.dumb_backtracking(maze_7x7)
     csp_7x7.backtracking(maze_7x7)
 
     print("Solving 8x8:")
     csp_8x8 = CSP(maze_8x8, False)
+    #csp_8x8.dumb_backtracking(maze_8x8)
     csp_8x8.backtracking(maze_8x8)
 
     print("Solving 9x9:")
     csp_9x9 = CSP(maze_9x9, False)
+    #csp_9x9.dumb_backtracking(maze_9x9)
     csp_9x9.backtracking(maze_9x9)
 
     print("Solving 10x10:")
     csp_10x10 = CSP(maze_10x10, False)
+    #csp_10x10.dumb_backtracking(maze_10x10)
     csp_10x10.backtracking(maze_10x10)
 
     print("Solving 12x12:")
     csp_12x12 = CSP(maze_12x12, False)
+    #csp_12x12.dumb_backtracking(maze_12x12)
     csp_12x12.backtracking(maze_12x12)
