@@ -14,7 +14,7 @@ class CSP:
         self.debug = debug
         self.find_s_and_f(maze)
         mazes.print_maze(maze)
-        self.c = constraints.Constraints(self.start, self.finish)
+        self.c = constraints.Constraints(self.start, self.finish, debug)
 
 
     def find_s_and_f(self, maze): #find start and finish to each color
@@ -43,6 +43,7 @@ class CSP:
             if self.debug:
                 print("Evaluating: ")
                 print("Domain is :{}".format(self.get_colors(node)))
+                print("Color: {}".format(color))
                 print("node is at x: {} y:{}".format(node.x, node.y))
                 node.value = 'X'
                 mazes.print_maze(assignment)
