@@ -12,6 +12,7 @@ class CSP:
         self.visited = []
         self.complete_colors = []
         self.debug = debug
+        self.moves = 0
         self.find_s_and_f(maze)
         mazes.print_maze(maze)
         self.c = constraints.Constraints(self.start, self.finish, debug)
@@ -39,7 +40,7 @@ class CSP:
         if node is None: #when all nodes have been visited but the assignment is not complete, instant fail
             return False
         for color in self.get_colors(node): #get all colors that are not complete
-
+            self.moves += 1
             if self.debug:
                 print("Evaluating: ")
                 print("Domain is :{}".format(self.get_colors(node)))
@@ -74,7 +75,7 @@ class CSP:
             return False
 
         for color in colors:
-
+            self.moves += 1
             if self.debug:
                 print("Evaluating: ")
                 print("Domain is :{}".format(self.get_colors(node)))
@@ -146,6 +147,7 @@ class CSP:
             if color not in self.complete_colors:
                 return False
         print('Complete')
+        print('Total Assignments: {}'.format(self.moves))
         return True
 
     def color_complete(self, color): #checks to see if color is complete
