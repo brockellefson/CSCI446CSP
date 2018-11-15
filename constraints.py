@@ -33,7 +33,7 @@ class Constraints:
         path = []
         while node not in path:
             for neighbor in node.neighbors:
-                if neighbor.value is '_' or neighbor is self.finish[color] or neighbor is self.start[color]:
+                if neighbor is self.finish[color] or neighbor is self.start[color]:
                     return False
                 if neighbor.value is color and neighbor not in path:
                     path.append(node)
@@ -41,6 +41,9 @@ class Constraints:
                     break
 
                 elif neighbor is node.neighbors[-1]:
+                    for neighbor in node.neighbors:
+                        if neighbor.value is '_':
+                            return False
                     if self.debug:
                         print("Failed due to cornered")
                     return True
