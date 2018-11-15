@@ -17,7 +17,7 @@ class CSP:
         self.c = constraints.Constraints(self.start, self.finish, debug)
 
 
-    def find_s_and_f(self, maze): #find start and finish to each color
+    def find_s_and_f(self, maze): #find start and finish source to each color
         for row in maze:
             for node in row:
                 if node.value is not '_':
@@ -29,7 +29,7 @@ class CSP:
                     else:
                         self.finish[node.value] = node
 
-    def dumb_backtracking(self, assignment):
+    def dumb_backtracking(self, assignment): #backtracking with no heuristics
         if self.complete(assignment): #if the assignment is complete, return and print maze
             mazes.print_maze(assignment)
             return assignment
@@ -38,7 +38,7 @@ class CSP:
 
         if node is None: #when all nodes have been visited but the assignment is not complete, instant fail
             return False
-        for color in self.get_colors(node):
+        for color in self.get_colors(node): #get all colors that are not complete
 
             if self.debug:
                 print("Evaluating: ")
@@ -63,12 +63,12 @@ class CSP:
                 node.value = '_'
         return False
 
-    def backtracking(self, assignment):
+    def backtracking(self, assignment): #backtracking with heuristics
         if self.complete(assignment): #if the assignment is complete, return and print maze
             mazes.print_maze(assignment)
             return assignment
 
-        colors, node = self.get_min_rem_val(assignment) #get a node that has not been visited
+        colors, node = self.get_min_rem_val(assignment) #get a node that has the least amount of available legal moves
 
         if node is None: #when all nodes have been visited but the assignment is not complete, instant fail
             return False
@@ -84,23 +84,26 @@ class CSP:
                 mazes.print_maze(assignment)
                 node.value = '_'
 
-            if self.consistant(color, node, assignment): #if the color we have chosen is legal, use it
-                self.visited.append(node)
+            node.value = color
+            self.visited.append(node)
 
-                result = self.dumb_backtracking(assignment) #move on to next node
-                if result:
-                    return result
+            if self.color_complete(color):
+                self.complete_colors.append(color)
 
-                self.visited.remove(node) #that branch failed, backtrack
-                if color in self.complete_colors:
-                    self.complete_colors.remove(color)
+            result = self.dumb_backtracking(assignment) #move on to next node
+            if result:
+                return result
 
-                node.value = '_'
+            self.visited.remove(node) #that branch failed, backtrack
+            if color in self.complete_colors:
+                self.complete_colors.remove(color)
+
+            node.value = '_'
         return False
 
-    def get_min_rem_val(self, assignment):
+    def get_min_rem_val(self, assignment): #find node with least available legal colors
         variable_values = []
-        id = 1
+        id = 1 #for unique ID's to break tie breakers
         heapq.heapify(variable_values)
         for row in assignment:
             for node in row:
@@ -112,9 +115,9 @@ class CSP:
                         for neighbor in node.neighbors:
                             if neighbor.value is not '_':
                                 if not self.c.zig_zag(neighbor, color) and not self.c.cornered(neighbor) and self.c.color_partcomplete_start(neighbor.value) and self.c.color_partcomplete_finish(neighbor.value):
-                                    legal_colors.append(color)
+                                    legal_colors.append(color) #if that colors does not violate any constraints, add it
                     node.value = '_'
-                    if len(legal_colors) is 1:
+                    if len(legal_colors) is 1: #if a node only has one legal move, automaticaly pick that one
                         return legal_colors, node
                     else:
                         heapq.heappush(variable_values, (len(legal_colors), id, legal_colors, node))
@@ -122,7 +125,7 @@ class CSP:
         curr_node = heapq.heappop(variable_values)
         return curr_node[2], curr_node[3]
 
-    def get_colors(self, node):
+    def get_colors(self, node): #get a color that is not complete
         colors = [] #prioitizes adjacent colors
         for neighbor in node.neighbors:
             if neighbor.value is not '_' and neighbor.value not in colors and neighbor.value not in self.complete_colors:
@@ -132,7 +135,7 @@ class CSP:
                 colors.append(color)
         return colors
 
-    def get_node(self, assignment):
+    def get_node(self, assignment): #get a node that is not visited
         for row in assignment:
             for node in row:
                 if node not in self.visited: #if node is not visited, return
@@ -145,8 +148,8 @@ class CSP:
         print('Complete')
         return True
 
-    def color_complete(self, color):
-        node = self.start[color]#checks to see if color is complete
+    def color_complete(self, color): #checks to see if color is complete
+        node = self.start[color]
         path = []
         while node is not self.finish[color]:
             for neighbor in node.neighbors:
@@ -158,7 +161,7 @@ class CSP:
                     return False
         return True
 
-    def consistant(self, color, node, assignment):
+    def consistant(self, color, node, assignment): #checks to see that color will not violate any constraints
         node.value = color
 
         #if the node will not cause a zig_zag, the start and finish node only have one child, and we dont corner any other nodes, move on

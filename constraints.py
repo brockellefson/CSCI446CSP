@@ -5,7 +5,7 @@ class Constraints:
         self.finish = finish
         self.debug = debug
 
-    def zig_zag(self, node, color):
+    def zig_zag(self, node, color): #checks to see that no adjacent nodes are zig_zaging
         if node.value is color:
             count = 0
             for neighbor in node.neighbors:
@@ -24,7 +24,7 @@ class Constraints:
                     return True
         return False
 
-    def cornered(self, node):
+    def cornered(self, node): #checks to see that node is not cornered
         color = node.value
 
         if node is self.finish[color] or node is self.start[color]:
@@ -51,8 +51,8 @@ class Constraints:
             print("Failed due to cornered")
         return True
 
-    def color_partcomplete_start(self, color):
-        node = self.start[color] #checks to see if color is part complete
+    def color_partcomplete_start(self, color): #checks to see if color is part complete
+        node = self.start[color]
         path = []
         while node not in path:
             for neighbor in node.neighbors:
@@ -74,8 +74,8 @@ class Constraints:
             print("Failed due to part complete start on color: {}".format(color))
         return False
 
-    def color_partcomplete_finish(self, color):
-        node = self.finish[color] #checks to see if color is part complete
+    def color_partcomplete_finish(self, color): #checks to see if color is part complete
+        node = self.finish[color]
         path = []
         while node not in path:
             for neighbor in node.neighbors:
