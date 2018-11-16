@@ -3,6 +3,8 @@ import heapq
 import mazes
 import random
 import constraints
+import sys
+import time
 
 class CSP:
     def __init__(self, maze, debug):
@@ -11,11 +13,18 @@ class CSP:
         self.start = {}
         self.visited = []
         self.complete_colors = []
-        self.debug = debug
+        self.debug = ''
+        if debug is 'True':
+            self.debug = True
+        elif debug is 'False':
+            self.debug = False
         self.moves = 0
         self.find_s_and_f(maze)
+        print('Solving:')
         mazes.print_maze(maze)
-        self.c = constraints.Constraints(self.start, self.finish, debug)
+        self.c = constraints.Constraints(self.start, self.finish, self.debug)
+
+
 
 
     def find_s_and_f(self, maze): #find start and finish source to each color
@@ -175,40 +184,17 @@ class CSP:
         return True
 
 if __name__=='__main__':
-    #create mazes
-    maze_5x5 = mazes.read_maze("5x5maze.txt")
-    maze_7x7 = mazes.read_maze("7x7maze.txt")
-    maze_8x8 = mazes.read_maze("8x8maze.txt")
-    maze_9x9 = mazes.read_maze("9x9maze.txt")
-    maze_10x10 = mazes.read_maze("10x10maze.txt")
-    maze_12x12 = mazes.read_maze("12x12maze.txt")
+    dumb_maze = mazes.read_maze(sys.argv[1])
+    csp_dumb = CSP(dumb_maze, sys.argv[2])
+    start = time.time()
+    csp_dumb.dumb_backtracking(dumb_maze)
+    end = time.time()
+    print("Dumb search took {} seconds\n".format(end - start))
 
-    print("Solving 5x5:")
-    csp_5x5 = CSP(maze_5x5, False)
-    #csp_5x5.dumb_backtracking(maze_5x5)
-    csp_5x5.backtracking(maze_5x5)
 
-    print("Solving 7x7:")
-    csp_7x7 = CSP(maze_7x7, False)
-    #csp_7x7.dumb_backtracking(maze_7x7)
-    csp_7x7.backtracking(maze_7x7)
-
-    print("Solving 8x8:")
-    csp_8x8 = CSP(maze_8x8, False)
-    #csp_8x8.dumb_backtracking(maze_8x8)
-    csp_8x8.backtracking(maze_8x8)
-
-    print("Solving 9x9:")
-    csp_9x9 = CSP(maze_9x9, False)
-    #csp_9x9.dumb_backtracking(maze_9x9)
-    csp_9x9.backtracking(maze_9x9)
-
-    print("Solving 10x10:")
-    csp_10x10 = CSP(maze_10x10, False)
-    #csp_10x10.dumb_backtracking(maze_10x10)
-    csp_10x10.backtracking(maze_10x10)
-
-    print("Solving 12x12:")
-    csp_12x12 = CSP(maze_12x12, False)
-    #csp_12x12.dumb_backtracking(maze_12x12)
-    csp_12x12.backtracking(maze_12x12)
+    smart_maze = mazes.read_maze(sys.argv[1])
+    csp_smart = CSP(smart_maze, sys.argv[2])
+    start = time.time()
+    csp_smart.backtracking(smart_maze)
+    end = time.time()
+    print("Smart search took {} seconds\n".format(end - start))
